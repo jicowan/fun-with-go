@@ -2,27 +2,42 @@ package main
 
 import "fmt"
 
-type foo struct {
-	word string 
+type mongo map[int]string
+type postgres map[int]string
+type accessor interface {
+	save(i int, s string)
+	retrieve(i int) string
 }
 
-type foobar interface {
-	bar()
+func (m mongo) save(i int, s string) {
+	m[i] = s
+}
+
+func (m postgres) save(i int, s string) {
+	m[i] = s
+}
+
+func (m mongo) retrieve(i int) string {
+	return m[i]
+}
+
+func (m postgres) retrieve(i int) string {
+	return m[i]
+}
+
+func put(a accessor, i int, s string) {
+	a.save(i, s)
+}
+
+func get(a accessor, i int) string {
+	return a.retrieve(i)
 }
 
 func main() {
-	fmt.Println("Hello world!")
-	f := foo {
-		word: "jkjkjkj",
-	}
-	f.bar()
-	submain(&f)
-}
-
-func submain(f foobar) {
-	f.bar()
-}
-
-func (f *foo) bar() {
-	fmt.Println("Hello from foo", f.word)
+	m := mongo{}
+	p := postgres{}
+	put(p, 1, "I'm a teapot")
+	put(m, 1, "hello world")
+	fmt.Println(get(m, 1))
+	fmt.Println(get(p, 1))
 }
